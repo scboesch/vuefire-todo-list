@@ -11,7 +11,9 @@
 		<button @click="addTodo">Add</button>
 		<ul>
 			<li v-for="todo in todos">
-				<input :value="todo.text" @input="updateTodoText(todo, $event.target.value)">
+				<input :value="todo.text" 
+			         :disabled="username!=todo.username"
+                @input="updateTodoText(todo, $event.target.value)">
         <button v-if="username==todo.username" 
                 @click="removeTodo(todo)">
                 X
