@@ -4,13 +4,19 @@
 </head>
 <body>
 	<div id="app">
-		<h3>Check out our awesome service</h3>
-		<input v-model.trim="newTodoText" @keyup.enter="addTodo" placeholder="Add new todo">
+		<b>Check out our awesome service</b>
+    Logged in as <input v-model.trim='username' @keyup.enter="updateUser" placeholder="Add username"><br>
+		<br>
+    <input v-model.trim="newTodoText" @keyup.enter="addTodo" placeholder="Add new todo">
 		<button @click="addTodo">Add</button>
 		<ul>
 			<li v-for="todo in todos">
 				<input :value="todo.text" @input="updateTodoText(todo, $event.target.value)">
-				<button @click="removeTodo(todo)">X</button>
+        <button v-if="username==todo.username" 
+                @click="removeTodo(todo)">
+                X
+        </button>
+        by {{todo.username}}
 			</li>
 		</ul>
 	</div>
@@ -21,11 +27,12 @@
 		var db = firebase.initializeApp({
         databaseURL: 'https://awesome-56c60.firebaseio.com'
       }).database()
-      var todosRef = db.ref('todos')
+      var todosRef = db.ref('todosWithUsername')
       new Vue({
         el: '#app',
         data: {
-          newTodoText: ''
+          newTodoText: '',
+          username:'anonymous'
         },
         firebase: {
           todos: todosRef.limitToLast(25)
@@ -33,12 +40,17 @@
         methods: {
           addTodo: function () {
             if (this.newTodoText) {
-              todosRef.push({ text: this.newTodoText})
+              todosRef.push({ 
+                  text: this.newTodoText,
+                   username:this.username})
               this.newTodoText = ''
             }
           },
           updateTodoText: function (todo, newText) {
             todosRef.child(todo['.key']).child('text').set(newText)
+          },
+          updateUser: function(){
+            
           },
           removeTodo: function (todo) {
             todosRef.child(todo['.key']).remove()
